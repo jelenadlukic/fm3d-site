@@ -305,7 +305,7 @@ export default async function ProfilePage({ searchParams }: PageProps) {
         )}
       </header>
 
-      <Accordion type="single" collapsible defaultValue="profile">
+      <Accordion type="single" collapsible>
         {/* Sekcija: Profil */}
         <AccordionItem value="profile" className="rounded-xl border p-4 mb-2">
           <AccordionTrigger>Profil (avatar + biografija)</AccordionTrigger>
