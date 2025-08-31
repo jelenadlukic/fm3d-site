@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+// (opciono, dodatno sprečava keširanje):
+export const revalidate = 0;
 // src/app/radovi/[slug]/page.tsx
 import { prisma } from "@/lib/prisma";
 import { signedUrl } from "@/lib/supabaseImage";

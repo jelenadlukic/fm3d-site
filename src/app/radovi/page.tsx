@@ -1,7 +1,13 @@
+export const dynamic = "force-dynamic";
+// (opciono, dodatno sprečava keširanje):
+export const revalidate = 0;
+
 import { prisma } from "@/lib/prisma";
 import { signedUrl } from "@/lib/supabaseImage";
 import Image from "next/image";
 import Link from "next/link";
+
+
 
 export default async function PublicWorks() {
   const rows = await prisma.work.findMany({

@@ -1,3 +1,7 @@
+export const dynamic = "force-dynamic";
+// (opciono, dodatno sprečava keširanje):
+export const revalidate = 0;
+
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { SmartImage } from "@/components/SmartImage";
