@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { BUCKET } from "@/lib/bucket";
+import { redirect } from "next/navigation";
 
 function slugify(s: string) {
   return s
@@ -80,6 +81,9 @@ export async function createPost(formData: FormData) {
 
   revalidatePath("/admin/vesti");
   revalidatePath("/vesti");
+  redirect(
+    "/admin/vesti?notice=" + encodeURIComponent("Vest je sačuvana kao draft.")
+  );
 }
 
 export async function updatePost(formData: FormData) {
@@ -159,6 +163,9 @@ export async function updatePost(formData: FormData) {
   revalidatePath(`/admin/vesti/${id}`);
   revalidatePath("/admin/vesti");
   revalidatePath("/vesti");
+  redirect(
+    `/admin/vesti/${id}?notice=` + encodeURIComponent("Izmene su sačuvane.")
+  );
 }
 
 export async function togglePublishAction(formData: FormData) {
@@ -193,4 +200,5 @@ export async function deletePostAction(formData: FormData) {
 
   revalidatePath("/admin/vesti");
   revalidatePath("/vesti");
+  redirect("/admin/vesti?notice=" + encodeURIComponent("Vest je obrisana."));
 }

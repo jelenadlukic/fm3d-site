@@ -8,6 +8,8 @@ import { CoverUploader } from "@/components/CoverUploader";
 import { RichTextLite } from "@/components/RichTextLite";
 import { ConfirmButton } from "@/components/ConfirmButton";
 
+import Flash from "@/components/Flash";
+
 import {
   createPost,
   deletePostAction,
@@ -46,6 +48,7 @@ export default async function AdminVestiPage() {
 
   return (
     <main className="relative mx-auto max-w-6xl px-4 py-10">
+      <Flash />
       <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-48 w-[100vw] -translate-x-1/2 blur-3xl bg-gradient-to-r from-purple-500/15 via-cyan-400/15 to-lime-400/15" />
 
       <header className="mb-8 flex items-center justify-between">

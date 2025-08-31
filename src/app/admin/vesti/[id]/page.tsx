@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth";
 import Link from "next/link";
 import { updatePost } from "@/app/admin/vesti/actions";
 import { CoverUploader } from "@/components/CoverUploader";
+import Flash from "@/components/Flash";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -33,6 +34,7 @@ export default async function AdminVestEdit({ params }: Props) {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <Flash />
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Uredi vest</h1>
         <Link href="/admin/vesti" className="text-sm underline opacity-80 hover:opacity-100">
