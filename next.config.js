@@ -14,6 +14,7 @@ const nextConfig = {
         hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname,
         pathname: "/storage/v1/object/**",
       },
+      { protocol: "https", hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname, pathname: "/storage/v1/object/sign/**" },
 
       // (opciono) Facebook CDN – koristi validan wildcard oblik
       { protocol: "https", hostname: "**.fbcdn.net" },

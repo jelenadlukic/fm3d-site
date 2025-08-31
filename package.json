@@ -11,7 +11,9 @@
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint",
-    "seed:admin": "node scripts/seed-admin.cjs"
+    "seed:admin": "node scripts/seed-admin.cjs",
+    "postinstall": "prisma generate",
+    "db:deploy": "prisma migrate deploy"
   },
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
