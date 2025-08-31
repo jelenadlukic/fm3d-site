@@ -1,21 +1,24 @@
 "use client";
-import * as React from "react";
 
-type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  message?: string;
+type Props = {
+  children: React.ReactNode;
+  className?: string;
+  message?: string; // tekst za confirm
+  type?: "button" | "submit";
 };
 
-/** Submit dugme koje pita za potvrdu. Ako korisnik klikne "Cancel", spreči submit. */
-export function ConfirmButton({ message = "Obrisati?", ...props }: Props) {
+export function ConfirmButton({ children, className, message, type = "button" }: Props) {
   return (
     <button
-      {...props}
+      type={type}
+      className={className}
       onClick={(e) => {
-        if (props.onClick) props.onClick(e);     // zadrži eventualni onClick
-        if (e.defaultPrevented) return;
-        const ok = typeof window !== "undefined" ? window.confirm(message) : true;
-        if (!ok) e.preventDefault();             // spreči submit forme
+        if (message && !window.confirm(message)) {
+          e.preventDefault();
+        }
       }}
-    />
+    >
+      {children}
+    </button>
   );
 }

@@ -1,35 +1,24 @@
+// src/components/SmartImage.tsx
 import Image, { ImageProps } from "next/image";
 
-type Props = Omit<ImageProps, "src"> & { src: string };
+export function SmartImage({ src, alt, ...rest }: ImageProps) {
+  if (!src) return null;
 
-function isAllowedHost(url: string) {
   try {
-    const u = new URL(url);
-    const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
-      ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-      : "";
-    return (
-      u.protocol === "https:" &&
-      (
-        u.hostname.endsWith(".fbcdn.net") ||          // Facebook CDN
-        u.hostname === supabaseHost                    // tvoj Supabase
-      )
-    );
-  } catch {
-    return false;
-  }
-}
+    const url = new URL(src as string);
+    const allowedHost =
+      process.env.NEXT_PUBLIC_SUPABASE_URL
+        ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+        : "bjrrqehyiducogxnhsaw.supabase.co";
 
-export function SmartImage({ src, alt, ...rest }: Props) {
-  // Lokalni fajl iz `public/`
-  if (src.startsWith("/")) {
-    return <Image src={src} alt={alt} {...rest} />;
+    // Dozvoli Next/Image za poznate hostove (Supabase Storage)
+    if (url.hostname === allowedHost && url.pathname.startsWith("/storage/v1/object/")) {
+      return <Image src={src} alt={alt} {...rest} />;
+    }
+  } catch {
+    // ako nije validan URL, pada na <img> ispod
   }
-  // Dozvoljeni eksterni hostovi → koristi Next/Image
-  if (isAllowedHost(src)) {
-    return <Image src={src} alt={alt} {...rest} />;
-  }
-  // Ostalo → klasičan <img> (bez Next optimizacije, ali i bez greške)
-   
-  return <img src={src} alt={alt} className={(rest as any).className} />;
+
+  // Fallback – bez optimizacije, ali nikad ne puca
+  return <img src={src as string} alt={alt as string} {...(rest as any)} />;
 }

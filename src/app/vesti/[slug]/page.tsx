@@ -1,39 +1,46 @@
 import { prisma } from "@/lib/prisma";
+import { signedUrl } from "@/lib/supabaseImage";
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { SmartImage } from "@/components/SmartImage"; // ili Image iz next/image uz rešenje A
-import ReactMarkdown from "react-markdown";
 
-export default async function PublicVest({ params }: { params: { slug: string } }) {
+type Props = { params: Promise<{ slug: string }> };
+
+export default async function PublicVest({ params }: Props) {
+  const { slug } = await params;
+
   const post = await prisma.post.findFirst({
-    where: { slug: params.slug, published: true },
+    where: { slug, published: true },
+    select: {
+      id: true, title: true, excerpt: true, content: true,
+      coverUrl: true, coverPath: true, createdAt: true, slug: true,
+    },
   });
-  if (!post) notFound();
 
-  const src =
-    post.coverUrl && post.coverUrl.startsWith("http")
-      ? post.coverUrl
-      : "/images/o-projektu/hero1.png";
+  if (!post) return notFound();
+
+  let coverSrc = "/images/o-projektu/hero1.png";
+  if (post.coverPath) {
+    try { coverSrc = await signedUrl(post.coverPath); } catch {}
+  } else if (post.coverUrl?.startsWith("http")) {
+    coverSrc = post.coverUrl;
+  }
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
-      <h1 className="text-3xl font-bold mb-3">{post.title}</h1>
+      <h1 className="text-3xl font-bold mb-2">{post.title}</h1>
+      <time className="text-xs opacity-70">{new Date(post.createdAt).toLocaleString()}</time>
 
-      <div className="relative h-72 w-full mb-4 overflow-hidden rounded-xl border border-border bg-black/10">
-        <SmartImage
-          src={src}
-          alt={post.title}
-          fill
-          sizes="100vw"
-          className="object-contain object-center"
-        />
-        {/* Ako koristiš rešenje A: zameni SmartImage sa <Image ... /> */}
+      <div className="relative my-6 aspect-[16/9] w-full overflow-hidden rounded-xl border border-border/50 bg-black/5">
+        <Image src={coverSrc} alt={post.title} fill sizes="100vw" className="object-contain" />
       </div>
 
-      {post.excerpt && <p className="opacity-80 mb-4">{post.excerpt}</p>}
+      {post.excerpt && <p className="mb-4 opacity-80">{post.excerpt}</p>}
 
-      <article className="prose prose-invert max-w-none">
-        <ReactMarkdown>{post.content ?? ""}</ReactMarkdown>
-      </article>
+      {post.content && (
+        <article className="prose prose-invert max-w-none">
+          <div>{post.content}</div>
+        </article>
+      )}
     </main>
   );
 }

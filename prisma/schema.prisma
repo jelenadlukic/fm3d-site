@@ -10,39 +10,35 @@ generator client {
 
 enum Role {
   SUPERADMIN
-  ADMIN
-  TEACHER
   STUDENT
   PARENT
 }
 
+/**
+ * -------------------- USER & AUTH --------------------
+ */
+
 model User {
   id            String    @id @default(cuid())
   name          String?
-  email         String    @unique        // ← obavezno
+  email         String    @unique
   emailVerified DateTime?
   image         String?
   role          Role      @default(STUDENT)
-  passwordHash  String    // ← obavezno
+  passwordHash  String?
 
-  accounts Account[]
-  sessions Session[]
-  posts    Post[]
-}
+  // Profil
+  bio        String?
+  avatarPath String?
+  avatarUrl  String?
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  slug      String   @unique
-  excerpt   String?
-  content   String?
-  coverUrl  String?
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  authorId String?
-  author   User?   @relation(fields: [authorId], references: [id])
+  // Relacije
+  accounts    Account[]
+  sessions    Session[]
+  posts       Post[]
+  works       Work[]         @relation("UserAuthorWorks") // ↔ Work.authorUser
+  badgesGiven BadgeReview[]  @relation("BadgeGiver") // ↔ BadgeReview.giver
+  journal     JournalEntry[]
 }
 
 model Account {
@@ -79,4 +75,131 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+/**
+ * -------------------- POST (Vesti) --------------------
+ */
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  slug      String   @unique
+  excerpt   String?
+  content   String?
+  coverUrl  String?
+  coverPath String?
+  published Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id])
+}
+
+/**
+ * -------------------- PARTICIPANT (direktorijum) --------------------
+ */
+
+enum ParticipantRole {
+  STUDENT
+  PARENT
+  SUPERADMIN
+}
+
+model Participant {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name        String
+  role        ParticipantRole
+  email       String?         @unique
+  phone       String?
+  bio         String?
+  isActive    Boolean         @default(true)
+  avatarPath  String?
+  avatarUrl   String?
+  schoolClass String?
+  // NEMA relaciju na Work (radove potpisuje User)
+}
+
+/**
+ * -------------------- WORK (Radovi) --------------------
+ */
+
+enum WorkMediaType {
+  IMAGE
+  VIDEO
+  GLTF
+  OTHER
+}
+
+model Work {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title       String
+  slug        String  @unique
+  excerpt     String?
+  description String?
+  published   Boolean @default(false)
+
+  coverPath String?
+  coverUrl  String?
+  filePath  String?
+  mediaType WorkMediaType @default(IMAGE)
+
+  // Autor je USER (ne Participant) — dosledno sa User.works
+  authorUserId String?
+  authorUser   User?   @relation("UserAuthorWorks", fields: [authorUserId], references: [id])
+
+  // Bedževi dobijeni na ovom radu
+  badges BadgeReview[]
+}
+
+/**
+ * -------------------- BADGES (peer kudos) --------------------
+ */
+
+enum Badge {
+  INNOVATIVE // inovativno
+  AESTHETIC // lepo / estetski skladno
+  CRAFT // zanatska izvedba / tehnička preciznost
+  TEAMWORK // timski rad / saradnja
+  PROGRESS // napredak u odnosu na ranije
+  HELPFUL // pomogao/la drugima
+}
+
+model BadgeReview {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  workId String
+  work   Work   @relation(fields: [workId], references: [id])
+
+  giverUserId String
+  giver       User   @relation("BadgeGiver", fields: [giverUserId], references: [id])
+
+  badge Badge
+  note  String?
+
+  @@unique([workId, giverUserId, badge]) // isti korisnik ne može isti bedž 2x istom radu
+}
+
+/**
+ * -------------------- JOURNAL (Dnevnik prakse) --------------------
+ */
+
+model JournalEntry {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id])
+  date           DateTime
+  text           String
+  attachmentPath String?
+  createdAt      DateTime @default(now())
+
+  @@unique([userId, date]) // 1 unos po danu
 }

@@ -19,38 +19,71 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(creds) {
         if (!creds?.email || !creds?.password) return null;
+
         const user = await prisma.user.findUnique({
           where: { email: creds.email },
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            passwordHash: true,
+            role: true,
+          },
         });
-        if (!user) return null;
-        if (!user.passwordHash || typeof user.passwordHash !== "string") return null;
+        if (!user || !user.passwordHash) return null;
+
         const ok = await bcrypt.compare(creds.password, user.passwordHash);
         if (!ok) return null;
+
+        // ⬇⬇ VAŽNO: vratimo i rolu
         return {
           id: user.id,
           email: user.email,
           name: user.name ?? user.email,
-        };
+          role: user.role, // <—
+        } as any;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = (user as any).id;
+      // na loginu upiši id i rolu u token
+      if (user) {
+        token.id = (user as any).id;
+        token.role = (user as any).role; // <—
+      }
       return token;
     },
     async session({ session, token }) {
-      if (token?.id && session.user) (session.user as any).id = token.id;
+      if (session.user) {
+        if (token?.id) (session.user as any).id = token.id;
+        if (token?.role) (session.user as any).role = token.role; // <—
+      }
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // ako NextAuth pokuša na root, šaljemo na dashboard
-      try {
-        const path = new URL(url, baseUrl).pathname;
-        if (path === "/") return `${baseUrl}/dashboard`;
-      } catch {}
-      return url.startsWith(baseUrl) ? url : baseUrl;
+      // Posle prijave NextAuth često koristi baseUrl kao polazni redirect.
+      // Ako je cilj "naša" domena, usmeri na /profil.
+      if (url.startsWith(baseUrl)) {
+        try {
+          const path = new URL(url).pathname;
+          // Sve tipične destinacije nakon sign-in / login vraćamo na /profil
+          if (
+            path === "/" ||
+            path === "/login" ||
+            path.startsWith("/api/auth/signin") ||
+            path.startsWith("/dashboard") // ako negde ostane stari link
+          ) {
+            return `${baseUrl}/profil`;
+          }
+          // inače propusti originalni interni URL
+          return url;
+        } catch {
+          return `${baseUrl}/profil`;
+        }
+      }
+      // spoljašnje domene – bezbedno vrati na root naše aplikacije
+      return baseUrl;
     },
   },
-  // NEMA Email providera → nema magic linkova
 };

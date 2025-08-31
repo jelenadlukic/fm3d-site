@@ -34,11 +34,8 @@ export default function LoginPage() {
     const res = await signIn("credentials", {
       email,
       password,
-      redirect: false,
-      // Ako hoćeš “ostani prijavljen” kroz dužu sesiju,
-      // možeš poslati flag pa u authorize/NextAuth options
-      // prilagoditi maxAge na serveru (opciono):
-      // remember: rememberEmail ? "true" : "false",
+      redirect: true,       // ⬅️ pusti NextAuth da redirektuje
+      callbackUrl: "/profil"// ⬅️ fallback; auth redirect callback ide na /profil
     });
 
     if (res?.error) {

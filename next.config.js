@@ -3,18 +3,23 @@ const SUPABASE_HOST = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : "bjrrqehyiducogxnhsaw.supabase.co";
 
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
+    // domains je deprecated – koristi samo remotePatterns
     remotePatterns: [
-      // Supabase Storage (public)
+      // ✅ Supabase Storage: dozvoli i public i sign rute
       {
         protocol: "https",
-        hostname: SUPABASE_HOST,
-        pathname: "/storage/v1/object/public/**",
+        hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname,
+        pathname: "/storage/v1/object/**",
       },
-      // Facebook CDN (primeri: scontent.fbeg5-1.fna.fbcdn.net, itd.)
-      { protocol: "https", hostname: "*.fbcdn.net" },
-      { protocol: "https", hostname: "scontent.*.fbcdn.net" }, // pokrije različite regione
+
+      // (opciono) Facebook CDN – koristi validan wildcard oblik
+      { protocol: "https", hostname: "**.fbcdn.net" },
+      { protocol: "https", hostname: "scontent-*.fbcdn.net" },
     ],
   },
 };
+
+module.exports = nextConfig;

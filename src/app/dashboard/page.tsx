@@ -39,7 +39,7 @@ export default async function DashboardHome() {
     where: { email: session.user.email! },
     select: { name: true, email: true, image: true, role: true },
   });
-  const role = user?.role ?? "USER";
+  const role = (user?.role as string) ?? "USER";
   const isAdmin = role === "ADMIN" || role === "SUPERADMIN";
   const isSuper = role === "SUPERADMIN";
 
@@ -66,10 +66,9 @@ export default async function DashboardHome() {
 
       {/* Brze akcije */}
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Quick href="/admin/vesti" title="Vesti" desc="Diseminacija: objave & najave" Icon={Newspaper} />
-        <Quick href="/admin/radovi/new" title="Novi rad" desc="Portfolio: rad učenika (GLTF/Video)" Icon={ImageIcon} />
-        <Quick href="/admin/konkurs" title="Konkurs & prijave" desc="Forma, kriterijumi, bodovanje" Icon={FolderKanban} />
-        <Quick href="/admin/mobilnosti" title="Mobilnosti" desc="Cohorti, LA, plan puta, sertifikati" Icon={Plane} />
+        <Quick href="/admin/vesti" title="Vesti" desc="Objave & najave" Icon={Newspaper} />
+        <Quick href="/admin/ucesnici" title="Učesnici" desc="Učenici · nastavnici · roditelji" Icon={Users} />
+        <Quick href="/admin/radovi" title="Radovi" desc="Kreiraj i objavi radove" Icon={ImageIcon} />
       </section>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">

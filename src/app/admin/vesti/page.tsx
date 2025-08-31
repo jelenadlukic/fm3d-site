@@ -1,4 +1,3 @@
-// src/app/admin/vesti/page.tsx
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
@@ -11,21 +10,15 @@ import { ConfirmButton } from "@/components/ConfirmButton";
 
 import {
   createPost,
-  deletePost,
-  togglePublish,
+  deletePostAction,
+  togglePublishAction,
 } from "@/app/admin/vesti/actions";
 
-// helper za slug
 function slugify(s: string) {
-  return s
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
+  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "");
 }
 
 export default async function AdminVestiPage() {
-  // auth + rola
   const session = await getServerSession(authOptions);
   const me = session?.user?.email
     ? await prisma.user.findUnique({ where: { email: session.user.email } })
@@ -35,22 +28,13 @@ export default async function AdminVestiPage() {
     redirect("/login");
   }
 
-  // ucitaj postove
   const posts = await prisma.post.findMany({
     orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      published: true,
-      createdAt: true,
-    },
+    select: { id: true, title: true, slug: true, published: true, createdAt: true },
   });
 
-  // SERVER ACTION: kreiraj novu vest
   async function actionCreate(formData: FormData) {
     "use server";
-    // ako nije dat slug, generisi iz naslova
     let givenSlug = (formData.get("slug")?.toString() || "").trim();
     if (!givenSlug) {
       const title = String(formData.get("title") || "");
@@ -61,8 +45,7 @@ export default async function AdminVestiPage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-4 py-10">
-      {/* glow pozadina */}
+    <main className="relative mx-auto max-w-6xl px-4 py-10">
       <div className="pointer-events-none absolute left-1/2 top-0 -z-10 h-48 w-[100vw] -translate-x-1/2 blur-3xl bg-gradient-to-r from-purple-500/15 via-cyan-400/15 to-lime-400/15" />
 
       <header className="mb-8 flex items-center justify-between">
@@ -154,20 +137,16 @@ export default async function AdminVestiPage() {
                   </td>
                   <td className="opacity-80">{new Date(p.createdAt).toLocaleString()}</td>
                   <td className="text-right space-x-2">
-                    {/* publish toggle */}
-                    <form className="inline">
-                      <button
-                        formAction={async () => {
-                          "use server";
-                          await togglePublish(p.id, !p.published);
-                        }}
-                        className="rounded-md border border-border px-2 py-1 hover:border-primary/60"
-                      >
+                    {/* Publish toggle */}
+                    <form action={togglePublishAction} className="inline">
+                      <input type="hidden" name="id" value={p.id} />
+                      <input type="hidden" name="publish" value={p.published ? "0" : "1"} />
+                      <button className="rounded-md border border-border px-2 py-1 hover:border-primary/60">
                         {p.published ? "Skini s objave" : "Objavi"}
                       </button>
                     </form>
 
-                    {/* uredi */}
+                    {/* Uredi */}
                     <Link
                       className="rounded-md border border-border px-2 py-1 hover:border-primary/60"
                       href={`/admin/vesti/${p.id}`}
@@ -175,17 +154,12 @@ export default async function AdminVestiPage() {
                       Uredi
                     </Link>
 
-                    {/* obriši */}
-                    <form
-                      action={async () => {
-                        "use server";
-                        await deletePost(p.id);
-                      }}
-                      className="inline"
-                    >
+                    {/* Obriši */}
+                    <form action={deletePostAction} className="inline">
+                      <input type="hidden" name="id" value={p.id} />
                       <ConfirmButton
-                        className="rounded-md border border-red-500/50 px-2 py-1 text-red-300 hover:border-red-400"
                         message="Obrisati vest?"
+                        className="rounded-md border border-red-500/50 px-2 py-1 text-red-300 hover:border-red-400"
                         type="submit"
                       >
                         Obriši
