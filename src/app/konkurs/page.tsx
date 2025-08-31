@@ -30,7 +30,7 @@ export default function KonkursPage() {
         <p className="text-white/70 max-w-3xl leading-relaxed">
           Pripremite osnovne podatke (biografija, kontakt), motivaciono pismo i linkove ka
           svojim radovima (ako ih imate). Detaljna uputstva, obrasci i tačni datumi biće
-          objavljeni ovde kako se konkurs približava. Hvala na interesovanju za FM3D —
+          objavljeni ovde i na zvaničnom sajtu škole kako se konkurs približava. Hvala na interesovanju za FM3D —
           Future Makers: 3D skills for tomorrow.
         </p>
       </section>

@@ -163,5 +163,43 @@
   * { @apply border-border; }
   body { @apply bg-background text-foreground; }
   html, body { overflow-x: hidden; }
+  html { scroll-behavior: smooth; }
+
+  @keyframes auroraQuick {
+  0%   { transform: translate3d(calc(var(--ax, 3%) * -1), calc(var(--ay, 1.2%) * -1), 0) rotate(calc(var(--rot, 1.2deg) * -1)) scale(var(--smin, 1.01)); }
+  50%  { transform: translate3d(var(--ax, 3%), var(--ay, 1.2%), 0) rotate(var(--rot, 1.2deg)) scale(var(--smax, 1.035)); }
+  100% { transform: translate3d(calc(var(--ax, 3%) * -1), calc(var(--ay, 1.2%) * -1), 0) rotate(calc(var(--rot, 1.2deg) * -1)) scale(var(--smin, 1.01)); }
+}
+
+.auroraBob {
+  animation: auroraBob var(--bobSec, 9s) ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes auroraBob {
+  0%   { transform: translate(-50%, -50%) translateY(calc(var(--bobAmpVh, 3vh) * -1)); }
+  50%  { transform: translate(-50%, -50%) translateY(calc(var(--bobAmpVh, 3vh))); }
+  100% { transform: translate(-50%, -50%) translateY(calc(var(--bobAmpVh, 3vh) * -1)); }
+}
+
+@keyframes beams {
+  0%   { background-position: 0 0, 50% 0%; }
+  100% { background-position: 100% 0, 50% 0%; }
+}
+
+/* suptilan “grain” bez data-URI */
+.grain {
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 2px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.02) 0, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 2px);
+  background-size: 160px 160px;
+  animation: grainShift 8s steps(10) infinite;
+}
+
+@keyframes grainShift {
+  0%   { transform: translate3d(0,0,0); }
+  100% { transform: translate3d(-10px, 6px, 0); }
+}
+
 }
 

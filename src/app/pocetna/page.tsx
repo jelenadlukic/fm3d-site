@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-// Ako se komponenta zove drugačije (npr. BeeScene.tsx), promeni putanju ispod
 const TScene = dynamic(() => import("@/components/threeScene"), { ssr: false });
 
 type Theme = {
@@ -29,7 +28,7 @@ type SectionItem = {
   desc: string[];
   href: string;
   cta: string;
-  align: "left" | "right"; // gde je tekst (pčela ide na suprotnu stranu)
+  align: "left" | "right";
   theme: Theme;
 };
 
@@ -116,9 +115,9 @@ const SECTIONS: SectionItem[] = [
     id: "ucesnici",
     title: "Učesnici",
     desc: [
-      "Autori i mentori, sa procesom: od skice i blokiranja do finala i dokumentacije.",
-      "Refleksija: šta je funkcionisalo, šta menjamo i koje veštine su savladane.",
-      "Radovi su citabilni i služe kao profesionalne reference.",
+      "Autori i mentori: od skice do finala i dokumentacije.",
+      "Refleksija: šta je funkcionisalo, šta menjamo, koje veštine su savladane.",
+      "Radovi služe kao profesionalne reference.",
     ],
     href: "/ucesnici",
     cta: "Pogledaj učesnike",
@@ -291,11 +290,6 @@ function Aurora({
     from, via, to,
     speedSec = 14,
     beamSpeedSec = 12,
-    ampX = "3%",
-    ampY = "1.2%",
-    rotDeg = "1.2deg",
-    scaleMin = 1.01,
-    scaleMax = 1.035,
     blurPx = 48,
     widthVw = 90,
     heightVh = 48,
@@ -305,7 +299,6 @@ function Aurora({
 
   return (
     <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-      {/* Bob wrapper */}
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 auroraBob"
         style={
@@ -319,7 +312,6 @@ function Aurora({
           } as React.CSSProperties
         }
       >
-        {/* Glavni oblak */}
         <div
           className="w-full h-full"
           style={{
@@ -340,7 +332,6 @@ function Aurora({
         />
       </div>
 
-      {/* Svetlosne trake */}
       <div
         className="absolute inset-x-0 top-0"
         style={{
@@ -357,11 +348,8 @@ function Aurora({
         }}
       />
 
-      {/* Feathering */}
       <div className="absolute inset-x-0 top-0 h-[14vh] bg-gradient-to-b from-black via-black/70 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 h-[16vh] bg-gradient-to-b from-transparent via-black/70 to-black" />
-
-      {/* Grain */}
       <div className="absolute inset-0 opacity-[0.06] mix-blend-soft-light grain" />
     </div>
   );
@@ -370,21 +358,18 @@ function Aurora({
 export default function Hero() {
   return (
     <section className="relative">
-      {/* 3D pčelica preko sadržaja; canvas providan, pointer-events: none */}
       <TScene />
 
       {SECTIONS.map((s) => {
         const isLeft = s.align === "left";
-
-        // Mobilni/tablet: niža aurora da ne preplavi sadržaj
         const mobileTheme = {
           ...s.theme,
           heightVh: Math.min(s.theme.heightVh ?? 80, 64),
         };
 
-        // poravnanja po breakpointima
-        const sideTitleLg = isLeft ? "lg:text-left lg:ml-0" : "lg:text-right lg:ml-auto";
-        const sideTextMd = isLeft ? "md:mx-0 md:ml-0" : "md:mx-0 md:ml-auto";
+        const titleAlign = isLeft ? "text-left" : "text-right ml-auto";
+        const bodyAlign = isLeft ? "text-left" : "text-right ml-auto";
+        const ctaAlign = isLeft ? "justify-start" : "justify-end";
 
         return (
           <section
@@ -392,8 +377,8 @@ export default function Hero() {
             id={s.id}
             className="
               section relative isolate
-              lg:min-h-screen          /* samo desktop full-height */
-              py-16 sm:py-20 lg:py-0  /* tablet nema full-height */
+              lg:min-h-screen
+              py-16 sm:py-20 lg:py-0
               flex items-center
               px-4 sm:px-6 lg:px-8
               bg-black overflow-hidden
@@ -404,18 +389,12 @@ export default function Hero() {
             </div>
 
             <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 md:grid-cols-12 items-center gap-8 sm:gap-10 lg:gap-12">
-              <div
-                className={[
-                  isLeft ? "md:col-span-7" : "md:col-start-6 md:col-span-7",
-                  isLeft ? "text-center lg:text-left" : "text-center lg:text-right",
-                ].join(" ")}
-              >
-                {/* Naslov: centar na mobilu, levo/desno na desktopu; max širina + pomeraj */}
+              <div className={isLeft ? "md:col-span-7" : "md:col-start-6 md:col-span-7"}>
                 <h2
                   className={[
                     "text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight",
-                    "max-w-4xl", // širi na desktopu
-                    sideTitleLg,
+                    "max-w-4xl",
+                    titleAlign,
                   ].join(" ")}
                   style={{
                     background:
@@ -427,12 +406,11 @@ export default function Hero() {
                   {s.title}
                 </h2>
 
-                {/* Tekst: centar+justified na mobilu, na ≥md prilepi levo/desno, i dalje justified */}
                 <div
                   className={[
                     "mt-6 text-white/85 text-base sm:text-lg space-y-4 sm:space-y-5",
                     "max-w-prose",
-                    isLeft ? "text-left" : "text-right ml-auto", // ← levo/desno + guranje bloka udesno
+                    bodyAlign,
                   ].join(" ")}
                 >
                   {s.desc.map((p, i) => (
@@ -440,8 +418,7 @@ export default function Hero() {
                   ))}
                 </div>
 
-                {/* CTA: centar na mobilu, levo/desno na desktopu */}
-                <div className={isLeft ? "mt-8 flex justify-center lg:justify-start" : "mt-8 flex justify-center lg:justify-end"}>
+                <div className={["mt-8 flex", ctaAlign].join(" ")}>
                   <Button
                     asChild
                     className="
@@ -458,7 +435,6 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* prazan stub za tablet/desktop da ostane vazduh za 3D */}
               <div className={isLeft ? "hidden md:block md:col-start-9 md:col-span-4" : "hidden md:block md:col-span-4"} />
             </div>
           </section>

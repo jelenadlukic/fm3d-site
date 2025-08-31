@@ -1,12 +1,12 @@
 import { Users } from "lucide-react";
 
 export const metadata = {
-  title: "Učesnici — FM3D",
+  title: "Radovi — FM3D",
   description:
-    "Na ovoj stranici biće istaknuti svi učesnici projekta FM3D nakon završetka konkursa i selekcije.",
+    "Na ovoj stranici biće istaknuti radovi učenika.",
 };
 
-export default function UcesniciPage() {
+export default function PortfolioPage() {
   return (
     <main className="relative mx-auto max-w-6xl px-4 py-10">
       {/* FULL-WIDTH glow kao na početnoj */}
@@ -18,12 +18,10 @@ export default function UcesniciPage() {
 
       <header className="mb-8">
         <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-          Učesnici projekta
+          Radovi
         </h1>
         <p className="mt-2 max-w-2xl text-white/70">
-         Na ovoj stranici biće istaknuti svi učesnici projekta nakon završetka konkursa i
-         transparentne selekcije. Biografije i uloge (učenik, mentor..) biće
-         povezane sa portfolijom radova i aktivnostima.
+         Na ovoj stranici biće istaknuti radovi učenika.
         </p>
       </header>
 
